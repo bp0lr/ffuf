@@ -148,6 +148,10 @@ func NewConfigOptions() *ConfigOptions {
 	c.General.Waf1 = false
 	c.General.Waf2 = false
 
+
+	c.General.Waf1 = false
+	c.General.Waf2 = false
+
 	c.Output.OutputCreateEmptyFile = false
 	return c
 }
