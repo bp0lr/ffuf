@@ -10,10 +10,10 @@ import (
 	"strings"
 
 	"github.com/bp0lr/ffuf/pkg/ffuf"
-	"github.com/ffuf/ffuf/pkg/filter"
-	"github.com/ffuf/ffuf/pkg/input"
-	"github.com/ffuf/ffuf/pkg/output"
-	"github.com/ffuf/ffuf/pkg/runner"
+	"github.com/bp0lr/ffuf/pkg/filter"
+	"github.com/bp0lr/ffuf/pkg/input"
+	"github.com/bp0lr/ffuf/pkg/output"
+	"github.com/bp0lr/ffuf/pkg/runner"
 )
 
 type multiStringFlag []string
