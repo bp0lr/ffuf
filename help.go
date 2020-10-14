@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ffuf/ffuf/pkg/ffuf"
+	"github.com/bp0lr/ffuf/pkg/ffuf"
 )
 
 type UsageSection struct {
@@ -61,7 +61,7 @@ func Usage() {
 		Description:   "",
 		Flags:         make([]UsageFlag, 0),
 		Hidden:        false,
-		ExpectedFlags: []string{"ac", "acc", "c", "config", "maxtime", "maxtime-job", "p", "rate", "s", "sa", "se", "sf", "t", "v", "V"},
+		ExpectedFlags: []string{"ac", "acc", "c", "config", "maxtime", "maxtime-job", "p", "rate", "s", "sa", "se", "sf", "t", "v", "V", "waf", "waf2"},
 	}
 	u_compat := UsageSection{
 		Name:          "COMPATIBILITY OPTIONS",

@@ -47,6 +47,9 @@ type Config struct {
 	Timeout                int                       `json:"timeout"`
 	Url                    string                    `json:"url"`
 	Verbose                bool                      `json:"verbose"`
+
+	Waf1                   bool                      `json:"waf1"`
+	Waf2                   bool                      `json:"waf2"`
 }
 
 type InputProviderConfig struct {
@@ -88,6 +91,10 @@ func NewConfig(ctx context.Context, cancel context.CancelFunc) Config {
 	conf.Timeout = 10
 	conf.Url = ""
 	conf.Verbose = false
+
+	conf.Waf1 = false
+	conf.Waf2 = false
+
 	return conf
 }
 
