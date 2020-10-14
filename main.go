@@ -113,6 +113,11 @@ func ParseFlags(opts *ffuf.ConfigOptions) *ffuf.ConfigOptions {
 	flag.Var(&headers, "H", "Header `\"Name: Value\"`, separated by colon. Multiple -H flags are accepted.")
 	flag.Var(&inputcommands, "input-cmd", "Command producing the input. --input-num is required when using this input method. Overrides -w.")
 	flag.Var(&wordlists, "w", "Wordlist file path and (optional) keyword separated by colon. eg. '/path/to/wordlist:KEYWORD'")
+
+
+	flag.BoolVar(&opts.General.Waf1, "waf", opts.General.Waf1, "WAF tricks: Referer header")
+	flag.BoolVar(&opts.General.Waf2, "waf2", opts.General.Waf2, "WAF tricks: X-IP localhost headers")
+
 	flag.Usage = Usage
 	flag.Parse()
 
