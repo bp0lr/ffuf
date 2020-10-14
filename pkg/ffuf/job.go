@@ -11,6 +11,8 @@ import (
 	"time"
 )
 
+var LastR 		Response
+
 //Job ties together Config, Runner, Input and Output
 type Job struct {
 	Config               *Config
@@ -312,7 +314,22 @@ func (j *Job) runTask(input map[string][]byte, position int, retried bool) {
 				_, _ = j.ReplayRunner.Execute(&replayreq)
 			}
 		}
-		j.Output.Result(resp)
+
+		// this stupid and sexy patch will save the last result and late compare with the current one to check if they are the same.
+		// in this way we can avoid false / positive if the site always returning 200.
+		
+		if(LastR.StatusCode == 0){
+			LastR=resp
+			j.Output.Result(LastR)
+		}else{
+			if(LastR.ContentLines != resp.ContentLines && LastR.ContentLength != resp.ContentLength && LastR.ContentWords != resp.ContentWords){
+				LastR=resp
+				j.Output.Result(LastR)				
+			}else{			
+				//j.Output.Error(fmt.Sprintf("Reflected : %s, %v, %v", resp.Request.Input["FUZZ"], LastR.ContentLength, LastR.ContentWords))	
+			}
+		}
+		
 		// Refresh the progress indicator as we printed something out
 		j.updateProgress()
 	}
