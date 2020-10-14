@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ffuf/ffuf/pkg/ffuf"
+	"github.com/bp0lr/ffuf/pkg/ffuf"
 )
 
 type UsageSection struct {

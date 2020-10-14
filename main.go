@@ -9,7 +9,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ffuf/ffuf/pkg/ffuf"
+	"github.com/bp0lr/ffuf/pkg/ffuf"
 	"github.com/ffuf/ffuf/pkg/filter"
 	"github.com/ffuf/ffuf/pkg/input"
 	"github.com/ffuf/ffuf/pkg/output"
