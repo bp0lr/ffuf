@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ffuf/ffuf/pkg/ffuf"
+	"github.com/bp0lr/ffuf/pkg/ffuf"
 )
 
 func NewFilterByName(name string, value string) (ffuf.FilterProvider, error) {
