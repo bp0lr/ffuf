@@ -14,6 +14,7 @@ import (
 	"github.com/bp0lr/ffuf/pkg/input"
 	"github.com/bp0lr/ffuf/pkg/output"
 	"github.com/bp0lr/ffuf/pkg/runner"
+	"github.com/nanobox-io/golang-scribble"
 )
 
 

@@ -15,4 +15,4 @@ type ResultDB struct{
 	cleanLen		int64
 }
 
-var mydb 	*scribble.Driver
+var mydb *scribble.Driver
