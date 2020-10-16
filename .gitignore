@@ -1,2 +1,6 @@
 /ffuf
 .idea
+
+go.mod
+
+go.sum
