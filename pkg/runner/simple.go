@@ -16,6 +16,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/bp0lr/ffuf/pkg/ffuf"
+	"github.com/grokify/html-strip-tags-go"
 )
 
 //Download results < 5MB
@@ -151,9 +152,13 @@ func (r *SimpleRunner) Execute(req *ffuf.Request) (ffuf.Response, error) {
 		resp.Data = respbody
 	}
 
-	wordsSize := len(strings.Split(string(resp.Data), " "))
+	
+	stripped := strip.StripTags(string(resp.Data))
+	resp.ContentWords = int64(len(stripped))
+
+	//wordsSize := len(strings.Split(string(resp.Data), " "))
 	linesSize := len(strings.Split(string(resp.Data), "\n"))
-	resp.ContentWords = int64(wordsSize)
+	//resp.ContentWords = int64(wordsSize)
 	resp.ContentLines = int64(linesSize)
 
 	return resp, nil
