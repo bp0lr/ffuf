@@ -16,6 +16,7 @@ import (
 	"github.com/bp0lr/ffuf/pkg/runner"
 )
 
+
 type multiStringFlag []string
 type wordlistFlag []string
 
@@ -59,6 +60,8 @@ func ParseFlags(opts *ffuf.ConfigOptions) *ffuf.ConfigOptions {
 	flag.BoolVar(&ignored, "i", true, "Dummy flag for copy as curl functionality (ignored)")
 	flag.BoolVar(&ignored, "k", false, "Dummy flag for backwards compatibility")
 	flag.BoolVar(&opts.Output.OutputCreateEmptyFile, "or", opts.Output.OutputCreateEmptyFile, "Don't create the output file if we don't have results")
+	flag.BoolVar(&opts.Output.OutputSaveToDB, "db", opts.Output.OutputSaveToDB, "Save Results to DB")
+	flag.BoolVar(&opts.Output.OutputFilter, "filter", opts.Output.OutputFilter, "Filter results based on repetitions")
 	flag.BoolVar(&opts.General.AutoCalibration, "ac", opts.General.AutoCalibration, "Automatically calibrate filtering options")
 	flag.BoolVar(&opts.General.Colors, "c", opts.General.Colors, "Colorize output.")
 	flag.BoolVar(&opts.General.Quiet, "s", opts.General.Quiet, "Do not print additional information (silent mode)")
@@ -201,6 +204,8 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Error in autocalibration, exiting: %s\n", err)
 		os.Exit(1)
 	}
+
+	ffuf.mydb, _ = scribble.New("./ffuf_Results", nil)
 
 	// Job handles waiting for goroutines to complete itself
 	job.Start()

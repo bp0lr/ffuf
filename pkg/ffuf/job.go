@@ -314,21 +314,13 @@ func (j *Job) runTask(input map[string][]byte, position int, retried bool) {
 				_, _ = j.ReplayRunner.Execute(&replayreq)
 			}
 		}
+	
+		// this stupid and sexy patch will save the result to a DB to be late filtered.		
+		test:=ResultDB{string(LastR.Request.Input["FUZZ"]), resp.StatusCode, resp.ContentLength, resp.ContentWords, resp.ContentLines, resp.ContentWords}
 
-		// this stupid and sexy patch will save the last result and late compare with the current one to check if they are the same.
-		// in this way we can avoid false / positive if the site always returning 200.
+		mydb.Write("ffuf_Results", string(LastR.Request.Input["FUZZ"]), test)
 		
-		if(LastR.StatusCode == 0){
-			LastR=resp
-			j.Output.Result(LastR)
-		}else{
-			if(LastR.ContentLines != resp.ContentLines && LastR.ContentLength != resp.ContentLength && LastR.ContentWords != resp.ContentWords){
-				LastR=resp
-				j.Output.Result(LastR)				
-			}else{			
-				//j.Output.Error(fmt.Sprintf("Reflected : %s, %v, %v", resp.Request.Input["FUZZ"], LastR.ContentLength, LastR.ContentWords))	
-			}
-		}
+		j.Output.Result(resp)
 		
 		// Refresh the progress indicator as we printed something out
 		j.updateProgress()

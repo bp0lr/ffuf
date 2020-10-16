@@ -79,6 +79,8 @@ type OutputOptions struct {
 	OutputFile      string
 	OutputFormat    string
 	OutputCreateEmptyFile	bool
+	OutputSaveToDB	bool
+	OutputFilter	bool
 }
 
 type FilterOptions struct {
@@ -153,6 +155,8 @@ func NewConfigOptions() *ConfigOptions {
 	c.General.Waf2 = false
 
 	c.Output.OutputCreateEmptyFile = false
+	c.Output.OutputSaveToDB = false
+	c.Output.OutputFilter = false
 	return c
 }
 
@@ -384,6 +388,9 @@ func ConfigFromOptions(parseOpts *ConfigOptions, ctx context.Context, cancel con
 	conf.OutputFile = parseOpts.Output.OutputFile
 	conf.OutputDirectory = parseOpts.Output.OutputDirectory
 	conf.OutputCreateEmptyFile = parseOpts.Output.OutputCreateEmptyFile
+	conf.OutputSaveToDB = parseOpts.Output.OutputSaveToDB
+	conf.OutputFilter = parseOpts.Output.OutputFilter
+
 	conf.IgnoreBody = parseOpts.HTTP.IgnoreBody
 	conf.Quiet = parseOpts.General.Quiet
 	conf.StopOn403 = parseOpts.General.StopOn403
