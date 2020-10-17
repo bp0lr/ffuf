@@ -36,6 +36,7 @@ type Result struct {
 	ContentLength    int64             `json:"length"`
 	ContentWords     int64             `json:"words"`
 	ContentLines     int64             `json:"lines"`
+	ContentLenStrip  int64             `json:"stripped"`
 	RedirectLocation string            `json:"redirectlocation"`
 	Url              string            `json:"url"`
 	ResultFile       string            `json:"resultfile"`
@@ -280,6 +281,30 @@ func (s *Stdoutput) Finalize() error {
 	return nil
 }
 
+func (s *Stdoutput) saveToUseLater(resp ffuf.Response){
+	if s.config.OutputFile != "" {
+		// No need to store results if we're not going to use them later
+		inputs := make(map[string][]byte, len(resp.Request.Input))
+		for k, v := range resp.Request.Input {
+			inputs[k] = v
+		}
+		sResult := Result{
+			Input:            inputs,
+			Position:         resp.Request.Position,
+			StatusCode:       resp.StatusCode,
+			ContentLength:    resp.ContentLength,
+			ContentWords:     resp.ContentWords,
+			ContentLines:     resp.ContentLines,
+			ContentLenStrip:  resp.ContentClean,
+			RedirectLocation: resp.GetRedirectLocation(false),
+			Url:              resp.Request.Url,
+			ResultFile:       resp.ResultFile,
+			Host:             resp.Request.Host,
+		}
+		s.Results = append(s.Results, sResult)
+	}
+}
+
 func (s *Stdoutput) Result(resp ffuf.Response) {
 	// Do we want to write request and response to a file
 	if len(s.config.OutputDirectory) > 0 {
@@ -301,6 +326,7 @@ func (s *Stdoutput) Result(resp ffuf.Response) {
 			ContentLength:    resp.ContentLength,
 			ContentWords:     resp.ContentWords,
 			ContentLines:     resp.ContentLines,
+			ContentLenStrip:  resp.ContentClean,
 			RedirectLocation: resp.GetRedirectLocation(false),
 			Url:              resp.Request.Url,
 			ResultFile:       resp.ResultFile,

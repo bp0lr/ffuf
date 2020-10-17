@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"unicode/utf8"
+	"unicode/utf8"	
 
 	"github.com/bp0lr/ffuf/pkg/ffuf"
 	"github.com/grokify/html-strip-tags-go"
@@ -152,14 +152,21 @@ func (r *SimpleRunner) Execute(req *ffuf.Request) (ffuf.Response, error) {
 		resp.Data = respbody
 	}
 
+	//name_ori:="test/"+string(resp.Request.Input["FUZZ"])+ "_ori.txt"
+	//name_fix:="test/"+string(resp.Request.Input["FUZZ"])+ "_fix.txt"
+	//ioutil.WriteFile(name_ori, resp.Data, 0)
 	
-	stripped := strip.StripTags(string(resp.Data))
-	resp.ContentWords = int64(len(stripped))
-
-	//wordsSize := len(strings.Split(string(resp.Data), " "))
+	wordsSize := len(strings.Split(string(resp.Data), " "))
 	linesSize := len(strings.Split(string(resp.Data), "\n"))
-	//resp.ContentWords = int64(wordsSize)
+	resp.ContentWords = int64(wordsSize)
 	resp.ContentLines = int64(linesSize)
+
+	stripped := strip.StripTags(string(resp.Data))
+	stripped = strings.TrimSpace(stripped)
+
+	//ioutil.WriteFile(name_fix, []byte(stripped), 0)
+
+	resp.ContentClean = int64(len(stripped))
 
 	return resp, nil
 }

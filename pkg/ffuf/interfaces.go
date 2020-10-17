@@ -42,4 +42,5 @@ type OutputProvider interface {
 	Error(errstring string)
 	Warning(warnstring string)
 	Result(resp Response)
+	SaveToUseLater(resp Response)
 }
