@@ -12,6 +12,7 @@ type ResultDB struct{
 	RContentWords	int64 `json:"rwords"`
 	RContentLines	int64 `json:"rlines"`
 	RcleanLen		int64 `json:"rlen"`
+	OriginalRes		Response `json:"response"`
 }
 
 func GetDbClient() *scribble.Driver{

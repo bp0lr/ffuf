@@ -9,7 +9,6 @@ import (
 	"sync"
 	"syscall"
 	"time"
-	"encoding/json"
 )
 
 //Job ties together Config, Runner, Input and Output
@@ -119,43 +118,6 @@ func (j *Job) Start() {
 		j.Counter = 0
 		j.startExecution()
 	}
-
-	if(j.Config.OutputSaveToDB && j.Config.OutputFilter){
-		dbClient := GetDbClient()
-		te:=ReturnAll(dbClient)
-		if(len(te) > 0){
-			fmt.Printf("\nResults: \n________________________________________________\n")
-			var t []ResultDB
-			for _, s := range te {	
-				
-				data := &ResultDB{}
-				
-				err := json.Unmarshal([]byte(s), &data)
-				if err != nil {
-					fmt.Printf("Error unmarshal: %v\n", err)
-				}else{
-					t=append(t, *data)
-				}
-			}
-
-			for _, val := range t {
-
-				var dupli bool= false		
-				for _, sea:= range t {
-					if(val.RcleanLen == sea.RcleanLen && val.Rname != sea.Rname){
-						//fmt.Printf("duplicado: %v:%v\n", val.Rname, val.RcleanLen)
-						dupli = true
-						break
-					}								
-				}
-				if(!dupli){
-				res := fmt.Sprintf("%s		  [Status: %d, Size: %d, Words: %d, Lines: %d, %d]", val.Rname, val.RstatusCode, val.RContentLength, val.RContentWords, val.RContentLines, val.RcleanLen)
-				fmt.Printf("[+] %v\n", res)
-				}			
-			}	
-		}
-	}
-
 
 	err := j.Output.Finalize()
 	if err != nil {
@@ -351,13 +313,13 @@ func (j *Job) runTask(input map[string][]byte, position int, retried bool) {
 			}
 		}
 	
-		if(j.Config.OutputSaveToDB && j.Config.OutputFilter){
+		if(j.Config.OutputSaveToDB || j.Config.OutputFilter){
 			// this stupid and sexy patch will save the result to a DB to be late filtered.
 			//////////////////////////////////////////////////////////////////////////////////////////////////
 			name:=string(resp.Request.Input["FUZZ"])
 			statuscode:=resp.StatusCode
 			
-			result:=ResultDB{string(name), statuscode, resp.ContentLength, resp.ContentWords, resp.ContentLines, resp.ContentClean}
+			result:=ResultDB{string(name), statuscode, resp.ContentLength, resp.ContentWords, resp.ContentLines, resp.ContentClean, resp}
 			
 			dbClient := GetDbClient()
 			UpdateDB(dbClient, name, "db", result)
