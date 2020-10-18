@@ -11,8 +11,6 @@ import (
 	"time"
 )
 
-var LastR 		Response
-
 //Job ties together Config, Runner, Input and Output
 type Job struct {
 	Config               *Config
@@ -315,13 +313,23 @@ func (j *Job) runTask(input map[string][]byte, position int, retried bool) {
 			}
 		}
 	
-		// this stupid and sexy patch will save the result to a DB to be late filtered.		
-		test:=ResultDB{string(LastR.Request.Input["FUZZ"]), resp.StatusCode, resp.ContentLength, resp.ContentWords, resp.ContentLines, resp.ContentWords}
+		if(j.Config.OutputSaveToDB || j.Config.OutputFilter){
+			// this stupid and sexy patch will save the result to a DB to be late filtered.
+			//////////////////////////////////////////////////////////////////////////////////////////////////
+			name:=string(resp.Request.Input["FUZZ"])
+			statuscode:=resp.StatusCode
+			
+			result:=ResultDB{string(name), statuscode, resp.ContentLength, resp.ContentWords, resp.ContentLines, resp.ContentClean, resp}
+			
+			dbClient := GetDbClient()
+			UpdateDB(dbClient, name, "db", result)
 
-		mydb.Write("ffuf_Results", string(LastR.Request.Input["FUZZ"]), test)
-		
-		j.Output.Result(resp)
-		
+			j.Output.SaveToUseLater(resp)
+			//////////////////////////////////////////////////////////////////////////////////////////////////
+		}else{
+			j.Output.Result(resp)	
+		}
+				
 		// Refresh the progress indicator as we printed something out
 		j.updateProgress()
 	}

@@ -8,13 +8,12 @@ import (
 	"log"
 	"os"
 	"strings"
-
+	
 	"github.com/bp0lr/ffuf/pkg/ffuf"
 	"github.com/bp0lr/ffuf/pkg/filter"
 	"github.com/bp0lr/ffuf/pkg/input"
 	"github.com/bp0lr/ffuf/pkg/output"
 	"github.com/bp0lr/ffuf/pkg/runner"
-	"github.com/nanobox-io/golang-scribble"
 )
 
 
@@ -206,7 +205,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	ffuf.mydb, _ = scribble.New("./ffuf_Results", nil)
+	if(opts.Output.OutputSaveToDB && opts.Output.OutputFilter){
+		_ = os.RemoveAll("resultsDB")
+	}
 
 	// Job handles waiting for goroutines to complete itself
 	job.Start()

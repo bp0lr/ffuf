@@ -8,6 +8,7 @@ import (
 	"path"
 	"strconv"
 	"time"
+	"encoding/json"
 
 	"github.com/bp0lr/ffuf/pkg/ffuf"
 )
@@ -36,6 +37,7 @@ type Result struct {
 	ContentLength    int64             `json:"length"`
 	ContentWords     int64             `json:"words"`
 	ContentLines     int64             `json:"lines"`
+	ContentLenStrip  int64             `json:"stripped"`
 	RedirectLocation string            `json:"redirectlocation"`
 	Url              string            `json:"url"`
 	ResultFile       string            `json:"resultfile"`
@@ -256,6 +258,67 @@ func (s *Stdoutput) writeToAll(config *ffuf.Config, res []Result) error {
 
 func (s *Stdoutput) Finalize() error {
 	var err error
+
+	//var myResult []Result
+
+	if(s.config.OutputSaveToDB || s.config.OutputFilter){
+
+		//clean up the current results
+		s.Results = nil
+
+		dbClient := ffuf.GetDbClient()
+		te:= ffuf.ReturnAll(dbClient)
+		if(len(te) > 0){
+			fmt.Printf("\n\nResults: \n------------------------------------------------\n")									   
+			var t []ffuf.ResultDB
+			for _, s := range te {	
+				
+				data := &ffuf.ResultDB{}
+				
+				err := json.Unmarshal([]byte(s), &data)
+				if err != nil {
+					fmt.Printf("Error unmarshal: %v\n", err)
+				}else{
+					t=append(t, *data)
+				}
+			}
+
+			for _, val := range t {
+
+				var dupli bool= false		
+				for _, sea:= range t {
+					if(val.RcleanLen == sea.RcleanLen && val.Rname != sea.Rname){
+						//fmt.Printf("duplicado: %v:%v\n", val.Rname, val.RcleanLen)
+						dupli = true
+						break
+					}								
+				}
+				
+				if(!dupli){
+				
+					res := fmt.Sprintf("%s		  [Status: %d, Size: %d, Words: %d, Lines: %d, %d]", val.Rname, val.RstatusCode, val.RContentLength, val.RContentWords, val.RContentLines, val.RcleanLen)
+					fmt.Printf("[+] %v\n", res)
+					
+					sResult := Result{
+						Input:            val.OriginalRes.Request.Input,
+						Position:         val.OriginalRes.Request.Position,
+						StatusCode:       val.OriginalRes.StatusCode,
+						ContentLength:    val.RContentLength,
+						ContentWords:     val.RContentWords,
+						ContentLines:     val.RContentLines,
+						ContentLenStrip:  val.RcleanLen,
+						RedirectLocation: val.OriginalRes.GetRedirectLocation(false),
+						Url:              val.OriginalRes.Request.Url,
+						ResultFile:       val.OriginalRes.ResultFile,
+						Host:             val.OriginalRes.Request.Host,
+					}
+					s.Results = append(s.Results, sResult)
+
+				}			
+			}	
+		}
+	}
+
 	if s.config.OutputFile != "" {
 		if s.config.OutputFormat == "all" {
 			err = s.writeToAll(s.config, s.Results)
@@ -280,6 +343,30 @@ func (s *Stdoutput) Finalize() error {
 	return nil
 }
 
+func (s *Stdoutput) SaveToUseLater(resp ffuf.Response){
+	if s.config.OutputFile != "" {
+		// No need to store results if we're not going to use them later
+		inputs := make(map[string][]byte, len(resp.Request.Input))
+		for k, v := range resp.Request.Input {
+			inputs[k] = v
+		}
+		sResult := Result{
+			Input:            inputs,
+			Position:         resp.Request.Position,
+			StatusCode:       resp.StatusCode,
+			ContentLength:    resp.ContentLength,
+			ContentWords:     resp.ContentWords,
+			ContentLines:     resp.ContentLines,
+			ContentLenStrip:  resp.ContentClean,
+			RedirectLocation: resp.GetRedirectLocation(false),
+			Url:              resp.Request.Url,
+			ResultFile:       resp.ResultFile,
+			Host:             resp.Request.Host,
+		}
+		s.Results = append(s.Results, sResult)
+	}
+}
+
 func (s *Stdoutput) Result(resp ffuf.Response) {
 	// Do we want to write request and response to a file
 	if len(s.config.OutputDirectory) > 0 {
@@ -301,6 +388,7 @@ func (s *Stdoutput) Result(resp ffuf.Response) {
 			ContentLength:    resp.ContentLength,
 			ContentWords:     resp.ContentWords,
 			ContentLines:     resp.ContentLines,
+			ContentLenStrip:  resp.ContentClean,
 			RedirectLocation: resp.GetRedirectLocation(false),
 			Url:              resp.Request.Url,
 			ResultFile:       resp.ResultFile,
