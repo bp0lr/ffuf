@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"time"
 	"encoding/json"
+	"net/url"
 
 	"github.com/bp0lr/ffuf/pkg/ffuf"
 )
@@ -267,7 +268,9 @@ func (s *Stdoutput) Finalize() error {
 		s.Results = nil
 
 		dbClient := ffuf.GetDbClient()
-		te:= ffuf.ReturnAll(dbClient)
+		r,_:= url.Parse(s.config.Url)
+		
+		te:= ffuf.ReturnAll(dbClient, r.Host)
 		if(len(te) > 0){
 			fmt.Printf("\n\nResults: \n------------------------------------------------\n")									   
 			var t []ffuf.ResultDB

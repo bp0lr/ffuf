@@ -322,7 +322,7 @@ func (j *Job) runTask(input map[string][]byte, position int, retried bool) {
 			result:=ResultDB{string(name), statuscode, resp.ContentLength, resp.ContentWords, resp.ContentLines, resp.ContentClean, resp}
 			
 			dbClient := GetDbClient()
-			UpdateDB(dbClient, name, "db", result)
+			UpdateDB(dbClient, resp.Request.Host, name, result)
 
 			j.Output.SaveToUseLater(resp)
 			//////////////////////////////////////////////////////////////////////////////////////////////////

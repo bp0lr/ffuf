@@ -205,9 +205,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	if(opts.Output.OutputSaveToDB && opts.Output.OutputFilter){
-		_ = os.RemoveAll("resultsDB")
-	}
+	//if(opts.Output.OutputSaveToDB && opts.Output.OutputFilter){
+	//	_ = os.RemoveAll("resultsDB")
+	//}
 
 	// Job handles waiting for goroutines to complete itself
 	job.Start()
